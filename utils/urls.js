@@ -7,4 +7,5 @@ export const urls = {
   mxrf11: 'https://www.fundsexplorer.com.br/funds/mxrf11',
   vghf11: 'https://www.fundsexplorer.com.br/funds/vghf11',
   vgir11: 'https://www.fundsexplorer.com.br/funds/vgir11',
+	rura11: 'https://www.fundsexplorer.com.br/funds/rura11',
 };

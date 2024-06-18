@@ -1,0 +1,8 @@
+irdm11: p/vp 0,88
+cpts11: p/vp 0,95
+bcff11: p/vp 0,92
+vgir11: p/vp 0,99
+hglg11: p/vp 1,04
+hctr11: p/vp 0,29
+vghf11: p/vp 0,97
+mxrf11: p/vp 1,06
