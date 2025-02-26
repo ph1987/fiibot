@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 import rp from 'request-promise';
 import $ from 'cheerio';
 import chalk from 'chalk';
@@ -11,7 +11,7 @@ const log = console.log;
 
 function saveFile(results) {
   const fileContent = results;
-  let date = new Date();
+  const date = new Date();
   const fileName = date.toISOString().split('T')[0];
 
   if (!fs.existsSync('history')) {
@@ -39,7 +39,7 @@ function resolveAfter2Seconds(refreshIntervalId) {
       console.log('─────────────────────────');
       for (const [key, value] of Object.entries(urls)) {
         rp(value)
-          .then(function(html){
+          .then((html)=> {
             const t = $('.indicators__box', html);
             t.each((_, div) => {
               if ($(div).text().toLocaleLowerCase().includes('p/vp')) {
@@ -55,7 +55,7 @@ function resolveAfter2Seconds(refreshIntervalId) {
               }
             });
           })
-          .catch(function(err){
+          .catch((err)=> {
             chalk.red(err);
         });
       }
