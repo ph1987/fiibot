@@ -1,0 +1,12 @@
+rura11: p/vp n/a
+hctr11: p/vp 0,15
+mxrf11: p/vp 0,95
+cpts11: p/vp 0,75
+vghf11: p/vp 0,77
+gare11: p/vp 0,91
+irdm11: p/vp 0,72
+bcff11: p/vp 0,83
+xpml11: p/vp 0,83
+vgir11: p/vp 0,90
+xplg11: p/vp 0,79
+hglg11: p/vp 0,95

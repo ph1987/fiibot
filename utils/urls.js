@@ -8,4 +8,7 @@ export const urls = {
   vghf11: 'https://www.fundsexplorer.com.br/funds/vghf11',
   vgir11: 'https://www.fundsexplorer.com.br/funds/vgir11',
 	rura11: 'https://www.fundsexplorer.com.br/funds/rura11',
+	xplg11: 'https://www.fundsexplorer.com.br/funds/xplg11',
+	xpml11: 'https://www.fundsexplorer.com.br/funds/xpml11',
+	gare11: 'https://www.fundsexplorer.com.br/funds/gare11',
 };
