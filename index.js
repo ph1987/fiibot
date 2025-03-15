@@ -1,5 +1,5 @@
 import * as fs from 'node:fs';
-import rp from 'request-promise';
+import axios from 'axios';
 import $ from 'cheerio';
 import chalk from 'chalk';
 import { urls } from './utils/urls.js';
@@ -20,47 +20,76 @@ function saveFile(results) {
 
   fs.writeFile(`./history/${fileName}.txt`, fileContent, (err) => {
       if (err) {
-        console.error('Erro ao salvar o arquivo:', err);
+        console.error('Error saving file:', err);
       }
   });
 }
 
-function resolveAfter2Seconds(refreshIntervalId) {
-  return new Promise(() => {
-    setTimeout(() => {
-      let count = 0;
-      const size = Object.keys(urls).length;
-      let results = '';
-      clearInterval(refreshIntervalId);
-      const date = new Date();
-      const formattedDatePtBr = format(date, 'dd/MM/yyyy HH:mm:ss', { locale: localePtBr });
-      console.log('\n\n─────────────────────────');
-      console.log(`   ${formattedDatePtBr}`);
-      console.log('─────────────────────────');
-      for (const [key, value] of Object.entries(urls)) {
-        rp(value)
-          .then((html)=> {
-            const t = $('.indicators__box', html);
-            t.each((_, div) => {
-              if ($(div).text().toLocaleLowerCase().includes('p/vp')) {
-                const txt = $(div).text().replace(/\s{2,}/g, ' ').trim().toLocaleLowerCase();
-                const value = Number(txt.split(' ')[1].replace(',', '.'));
-                value > 1 ? log(chalk.red(`   ${key}: ${txt}`)) : log(chalk.green((`   ${key}: ${txt}`)));
-                results += `${key}: ${txt}\n`;
-                count++;
-                if (count === size) {
-                  saveFile(results);
-                  console.log('─────────────────────────\n');
-                }
-              }
-            });
-          })
-          .catch((err)=> {
-            chalk.red(err);
-        });
+// Função para aguardar um tempo antes de executar a próxima requisição
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchData(url, key) {
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+      },
+    });
+    const html = response.data;
+
+    const t = $('.indicators__box', html);
+    let result = null;
+
+    t.each((_, div) => {
+      if ($(div).text().toLocaleLowerCase().includes('p/vp')) {
+        const txt = $(div).text().replace(/\s{2,}/g, ' ').trim().toLocaleLowerCase();
+        const value = Number(txt.split(' ')[1].replace(',', '.'));
+
+        value > 1
+          ? log(chalk.red(`   ${key}: ${txt}`))
+          : log(chalk.green(`   ${key}: ${txt}`));
+
+        result = `${key}: ${txt}`;
       }
-    }, 2000);
-  });
+    });
+
+    return result;
+  } catch (err) {
+    console.error(chalk.red(`Error fetching ${key}: ${err.message}`));
+    return null;
+  }
+}
+
+async function resolveAfter2Seconds(refreshIntervalId) {
+  clearInterval(refreshIntervalId);
+
+  const date = new Date();
+  const formattedDatePtBr = format(date, 'dd/MM/yyyy HH:mm:ss', { locale: localePtBr });
+
+  console.log('\n\n─────────────────────────');
+  console.log(`   ${formattedDatePtBr}`);
+  console.log('─────────────────────────');
+
+  const results = [];
+  
+  // Processa cada requisição individualmente com um intervalo de 2 segundos
+  for (const [key, value] of Object.entries(urls)) {
+    const result = await fetchData(value, key);
+    if (result) {
+      results.push(result);
+    }
+    await delay(2000); // Aguarda 2 segundos antes da próxima requisição
+  }
+
+  const finalResults = results.join('\n');
+
+  console.log('─────────────────────────\n');
+
+  if (finalResults) {
+    saveFile(finalResults);
+  }
 }
 
 async function asyncCall() {
