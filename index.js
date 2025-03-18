@@ -10,7 +10,7 @@ import localePtBr from 'date-fns/locale/pt-BR';
 const log = console.log;
 
 function saveFile(results) {
-  const fileContent = results;
+  const fileContent = results.map(item => item.value).join('\n');
   const date = new Date();
   const fileName = date.toISOString().split('T')[0];
 
@@ -19,10 +19,19 @@ function saveFile(results) {
   }
 
   fs.writeFile(`./history/${fileName}.txt`, fileContent, (err) => {
-      if (err) {
-        console.error('Error saving file:', err);
-      }
+    if (err) {
+      console.error('Error saving file:', err);
+    }
   });
+
+  const jsonContent = results.map(item => {
+    const partes = item.value.split('p/vp');
+    const pvp = partes[1] ? partes[1].trim() : '';
+    const cod = item.key.replace(/[0-9]/g, '');
+    return { cod, pvp };
+  });
+
+  fs.writeFileSync(`./history/${fileName}.json`, JSON.stringify(jsonContent, null, 2));
 }
 
 // Função para aguardar um tempo antes de executar a próxima requisição
@@ -74,22 +83,19 @@ async function resolveAfter2Seconds(refreshIntervalId) {
 
   const results = [];
   
-  // Processa cada requisição individualmente com um intervalo de 2 segundos
   for (const [key, value] of Object.entries(urls)) {
-    const result = await fetchData(value, key);
-    if (result) {
-      results.push(result);
-    }
-    await delay(2000); // Aguarda 2 segundos antes da próxima requisição
-  }
-
-  const finalResults = results.join('\n');
+		const result = await fetchData(value, key);
+		if (result) {
+			results.push({ key, value: result });
+		}
+		await delay(2000);
+	}
 
   console.log('─────────────────────────\n');
 
-  if (finalResults) {
-    saveFile(finalResults);
-  }
+  if (results.length) {
+		saveFile(results);
+	}
 }
 
 async function asyncCall() {
