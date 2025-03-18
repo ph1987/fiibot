@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>fiibot</title>
+</head>
+<body>
+  <h1>fiibot</h1>
+  <div id="history-links">
+    <!-- Os links serão inseridos aqui -->
+  </div>
+
+  <script>
+    async function fetchHistory() {
+      try {
+        const response = await fetch('/listHistory');
+        if (!response.ok) {
+          throw new Error('Erro ao buscar os arquivos');
+        }
+        const files = await response.json();
+        const container = document.getElementById('history-links');
+        files.forEach(file => {
+          const link = document.createElement('a');
+          link.href = 'history/' + file;
+          link.textContent = file;
+          link.style.display = 'block'; // quebra linha para cada link
+          container.appendChild(link);
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchHistory();
+  </script>
+</body>
+</html>
