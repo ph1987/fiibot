@@ -1,9 +1,10 @@
+// api/scrap.js
 import * as fs from 'node:fs';
 import axios from 'axios';
 import $ from 'cheerio';
 import chalk from 'chalk';
-import { urls } from './utils/urls.js';
-import { loadingAnimation } from './utils/animation.js';
+import { urls } from '../utils/urls.js'; // ajuste o caminho se necessário
+import { loadingAnimation } from '../utils/animation.js';
 import { format } from 'date-fns';
 import localePtBr from 'date-fns/locale/pt-BR';
 
@@ -70,9 +71,7 @@ async function fetchData(url, key) {
   }
 }
 
-async function resolveAfter2Seconds(refreshIntervalId) {
-  clearInterval(refreshIntervalId);
-
+async function resolveAfter2Seconds() {
   const date = new Date();
   const formattedDatePtBr = format(date, 'dd/MM/yyyy HH:mm:ss', { locale: localePtBr });
 
@@ -83,23 +82,21 @@ async function resolveAfter2Seconds(refreshIntervalId) {
   const results = [];
   
   for (const [key, value] of Object.entries(urls)) {
-		const result = await fetchData(value, key);
-		if (result) {
-			results.push({ key, value: result });
-		}
-		await delay(2000);
-	}
+    const result = await fetchData(value, key);
+    if (result) {
+      results.push({ key, value: result });
+    }
+    await delay(2000);
+  }
 
   console.log('─────────────────────────\n');
 
   if (results.length) {
-		saveFile(results);
-	}
+    saveFile(results);
+  }
 }
 
-async function asyncCall() {
-  const refreshIntervalId = loadingAnimation();
-  await resolveAfter2Seconds(refreshIntervalId);
+export default async function handler(req, res) {
+  await resolveAfter2Seconds();
+  res.status(200).json({ message: 'Scraping executado com sucesso.' });
 }
-
-asyncCall();

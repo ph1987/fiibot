@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/scrap.js": {
+      "schedule": "0 0 * * *"
+    }
+  }
+}
