@@ -27,7 +27,7 @@ function saveFile(results) {
   const jsonContent = results.map(item => {
     const partes = item.value.split('p/vp');
     const pvp = partes[1] ? partes[1].trim() : '';
-    const cod = item.key.replace(/[0-9]/g, '');
+    const cod = item.key;
     return { cod, pvp };
   });
 
