@@ -1,7 +1,8 @@
 {
-  "functions": {
-    "api/scrap.js": {
+  "crons": [
+    {
+      "path": "/api/scrap.js",
       "schedule": "0 0 * * *"
     }
-  }
+  ]
 }
