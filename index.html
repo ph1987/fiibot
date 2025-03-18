@@ -14,7 +14,7 @@
   <script>
     async function fetchHistory() {
       try {
-        const response = await fetch('/listHistory');
+        const response = await fetch('/api/listHistory');
         if (!response.ok) {
           throw new Error('Erro ao buscar os arquivos');
         }
