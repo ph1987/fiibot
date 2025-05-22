@@ -22,6 +22,7 @@ async function saveFile(results) {
   const date = new Date();
   const fileName = date.toISOString().split('T')[0];
 
+	/*
   if (!fs.existsSync('history')) {
     fs.mkdirSync('history');
   }
@@ -31,6 +32,7 @@ async function saveFile(results) {
       console.error('Error saving file:', err);
     }
   });
+	*/
 
   const jsonContent = results.map(item => {
     const parts = item.value.split('p/vp');
@@ -39,7 +41,7 @@ async function saveFile(results) {
     return { cod, pvp };
   });
 
-  fs.writeFileSync(`./history/${fileName}.json`, JSON.stringify(jsonContent, null, 2));
+  //fs.writeFileSync(`./history/${fileName}.json`, JSON.stringify(jsonContent, null, 2));
 
 	const txtBody = Buffer.from(fileContent, "utf-8");
 	await objectStorageClient.putObject({
