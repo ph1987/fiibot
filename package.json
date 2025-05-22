@@ -19,6 +19,8 @@
     "cheerio": "^1.0.0-rc.12",
     "date-fns": "^3.3.1",
     "node": "^21.6.1",
+    "oci-common": "^2.109.0",
+    "oci-objectstorage": "^2.109.0",
     "puppeteer": "^21.7.0",
     "request": "^2.88.2",
     "request-promise": "^4.2.6"
