@@ -41,8 +41,6 @@ async function saveFile(results) {
 
   fs.writeFileSync(`./history/${fileName}.json`, JSON.stringify(jsonContent, null, 2));
 
-	// BUCKET
-	/*
 	const txtBody = Buffer.from(fileContent, "utf-8");
 	await objectStorageClient.putObject({
 		namespaceName: NAMESPACE,
@@ -58,7 +56,6 @@ async function saveFile(results) {
 		objectName:    `fiibot/history/json/${fileName}.json`,
 		putObjectBody: jsonBody
 	});
-	*/
 }
 
 function delay(ms) {

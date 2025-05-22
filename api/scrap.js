@@ -1,38 +1,49 @@
-// api/scrap.js
 import * as fs from 'node:fs';
 import axios from 'axios';
 import $ from 'cheerio';
 import chalk from 'chalk';
-import { urls } from '../utils/urls.js'; // ajuste o caminho se necessário
-import { loadingAnimation } from '../utils/animation.js';
+import { urls } from './utils/urls.js';
+import { loadingAnimation } from './utils/animation.js';
 import { format } from 'date-fns';
 import localePtBr from 'date-fns/locale/pt-BR';
+import { ConfigFileAuthenticationDetailsProvider } from "oci-common";
+import { ObjectStorageClient } from "oci-objectstorage";
+
+const provider = new ConfigFileAuthenticationDetailsProvider();
+const objectStorageClient   = new ObjectStorageClient({ authenticationDetailsProvider: provider });
+
+const NAMESPACE = "axcyntfguubc";
+const BUCKET  = "bucket-phldev";
 
 const log = console.log;
 
-function saveFile(results) {
+async function saveFile(results) {
   const fileContent = results.map(item => item.value).join('\n');
   const date = new Date();
   const fileName = date.toISOString().split('T')[0];
 
-  if (!fs.existsSync('history')) {
-    fs.mkdirSync('history');
-  }
-
-  fs.writeFile(`./history/${fileName}.txt`, fileContent, (err) => {
-    if (err) {
-      console.error('Error saving file:', err);
-    }
-  });
-
   const jsonContent = results.map(item => {
-    const partes = item.value.split('p/vp');
-    const pvp = partes[1] ? partes[1].trim() : '';
+    const parts = item.value.split('p/vp');
+    const pvp = parts[1] ? parts[1].trim() : '';
     const cod = item.key;
     return { cod, pvp };
   });
 
-  fs.writeFileSync(`./history/${fileName}.json`, JSON.stringify(jsonContent, null, 2));
+	const txtBody = Buffer.from(fileContent, "utf-8");
+	await objectStorageClient.putObject({
+		namespaceName: NAMESPACE,
+		bucketName:    BUCKET,
+		objectName:    `fiibot/history/txt/${fileName}.txt`,
+		putObjectBody: txtBody
+	});
+
+	const jsonBody = Buffer.from(JSON.stringify(jsonContent, null, 2), "utf-8");
+	await objectStorageClient.putObject({
+		namespaceName: NAMESPACE,
+		bucketName:    BUCKET,
+		objectName:    `fiibot/history/json/${fileName}.json`,
+		putObjectBody: jsonBody
+	});
 }
 
 function delay(ms) {
@@ -71,7 +82,9 @@ async function fetchData(url, key) {
   }
 }
 
-async function resolveAfter2Seconds() {
+async function resolveAfter2Seconds(refreshIntervalId) {
+  clearInterval(refreshIntervalId);
+
   const date = new Date();
   const formattedDatePtBr = format(date, 'dd/MM/yyyy HH:mm:ss', { locale: localePtBr });
 
@@ -82,21 +95,23 @@ async function resolveAfter2Seconds() {
   const results = [];
   
   for (const [key, value] of Object.entries(urls)) {
-    const result = await fetchData(value, key);
-    if (result) {
-      results.push({ key, value: result });
-    }
-    await delay(2000);
-  }
+		const result = await fetchData(value, key);
+		if (result) {
+			results.push({ key, value: result });
+		}
+		await delay(2000);
+	}
 
   console.log('─────────────────────────\n');
 
   if (results.length) {
-    saveFile(results);
-  }
+		await saveFile(results);
+	}
 }
 
-export default async function handler(req, res) {
-  await resolveAfter2Seconds();
-  res.status(200).json({ message: 'Scraping executado com sucesso.' });
+async function asyncCall() {
+  const refreshIntervalId = loadingAnimation();
+  await resolveAfter2Seconds(refreshIntervalId);
 }
+
+asyncCall();
