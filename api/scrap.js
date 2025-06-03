@@ -3,8 +3,8 @@ import * as fs from 'node:fs';
 import axios from 'axios';
 import $ from 'cheerio';
 import chalk from 'chalk';
-import { urls } from './utils/urls.js';
-import { loadingAnimation } from './utils/animation.js';
+import { urls } from '../utils/urls.js';
+import { loadingAnimation } from '../utils/animation.js';
 import { format } from 'date-fns';
 import localePtBr from 'date-fns/locale/pt-BR';
 
