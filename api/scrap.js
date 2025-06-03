@@ -119,19 +119,14 @@ async function resolveAfter2Seconds() {
   console.log(`   ${formattedDatePtBr}`);
   console.log("─────────────────────────");
 
-  // 1) Requisições paralelas
-  const entries = Object.entries(urls);
-  const fetchPromises = entries.map(([key, value]) =>
-    fetchData(value, key).then((result) => ({ key, result }))
-  );
-
-  // 2) Aguarda todas as promessas (pode estourar timeout se muitas URLS bem lentas)
-  const fetched = await Promise.all(fetchPromises);
-
-  // 3) Filtra só as válidas
-  const results = fetched
-    .filter((item) => item.result)
-    .map((item) => ({ key: item.key, value: item.result }));
+  const results = [];
+  for (const [key, value] of Object.entries(urls)) {
+    const result = await fetchData(value, key);
+    if (result) {
+      results.push({ key, value: result });
+    }
+    await delay(2000);
+  }
 
   console.log("─────────────────────────\n");
 
