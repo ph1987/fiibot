@@ -14,23 +14,29 @@ const { SimpleAuthenticationDetailsProvider, Region } = pkgCommon;
 import pkgOS from "oci-objectstorage";
 const { ObjectStorageClient } = pkgOS;
 
-console.log(">>> OCI_REGION =", process.env.OCI_REGION);
-console.log(">>> OCI_TENANCY =", !!process.env.OCI_TENANCY);
-console.log(">>> OCI_USER =", !!process.env.OCI_USER);
-console.log(">>> OCI_FINGERPRINT =", !!process.env.OCI_FINGERPRINT);
-console.log(">>> OCI_PRIVATE_KEY length =", process.env.OCI_PRIVATE_KEY?.length ?? 0);
+const rawKey = process.env.OCI_PRIVATE_KEY;
+console.log(">>> RAW KEY SLICE (first 50 chars):", rawKey?.slice(0, 50));
+console.log(">>> RAW KEY INCLUDES \\n LITERALS? ", rawKey?.includes("\\n"));
+console.log(">>> RAW KEY INCLUDES actual newline? ", rawKey?.includes("\n"));
+console.log(">>> RAW KEY LENGTH:", rawKey?.length);
+
+const pemKey = rawKey ? rawKey.replace(/\\n/g, "\n") : undefined;
 
 
-const provider = new SimpleAuthenticationDetailsProvider(
-  process.env.OCI_TENANCY,
-  process.env.OCI_USER,
-  process.env.OCI_FINGERPRINT,
-  process.env.OCI_PRIVATE_KEY
-    ? process.env.OCI_PRIVATE_KEY.replace(/\\n/g, "\n")
-    : undefined,
-  process.env.OCI_PASSPHRASE || null,
-  Region.fromRegionId(process.env.OCI_REGION)
-);
+try {
+	const provider = new SimpleAuthenticationDetailsProvider(
+		process.env.OCI_TENANCY,
+		process.env.OCI_USER,
+		process.env.OCI_FINGERPRINT,
+		process.env.OCI_PRIVATE_KEY
+			? process.env.OCI_PRIVATE_KEY.replace(/\\n/g, "\n")
+			: undefined,
+		process.env.OCI_PASSPHRASE || null,
+		Region.fromRegionId(process.env.OCI_REGION)
+	);
+} catch (err) {
+  console.error("FAILED_TO_CREATE_PROVIDER:", err);
+}
 
 const objectStorageClient = new ObjectStorageClient({
   authenticationDetailsProvider: provider,
