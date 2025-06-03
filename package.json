@@ -18,6 +18,7 @@
     "chalk": "^5.3.0",
     "cheerio": "^1.0.0-rc.12",
     "date-fns": "^3.3.1",
+    "dotenv": "^16.5.0",
     "node": "^21.6.1",
     "oci-common": "^2.109.0",
     "oci-objectstorage": "^2.109.0",

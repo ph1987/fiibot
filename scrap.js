@@ -1,28 +1,40 @@
+import "dotenv/config"; 
 import * as fs from 'node:fs';
 import axios from 'axios';
 import $ from 'cheerio';
 import chalk from 'chalk';
-import { urls } from './../utils/urls.js';
-import { loadingAnimation } from './../utils/animation.js';
+import { urls } from './utils/urls.js';
+import { loadingAnimation } from './utils/animation.js';
 import { format } from 'date-fns';
 import localePtBr from 'date-fns/locale/pt-BR';
-import { common } from "oci-common";
-import { ObjectStorageClient } from "oci-objectstorage";
 
-// const provider = new ConfigFileAuthenticationDetailsProvider();
+import pkgCommon from "oci-common";
+const { SimpleAuthenticationDetailsProvider, Region } = pkgCommon;
 
-const provider = new common.SimpleAuthenticationDetailsProvider(
+import pkgOS from "oci-objectstorage";
+const { ObjectStorageClient } = pkgOS;
+
+console.log(">>> OCI_REGION =", process.env.OCI_REGION);
+console.log(">>> OCI_TENANCY =", !!process.env.OCI_TENANCY);
+console.log(">>> OCI_USER =", !!process.env.OCI_USER);
+console.log(">>> OCI_FINGERPRINT =", !!process.env.OCI_FINGERPRINT);
+console.log(">>> OCI_PRIVATE_KEY length =", process.env.OCI_PRIVATE_KEY?.length ?? 0);
+
+
+const provider = new SimpleAuthenticationDetailsProvider(
   process.env.OCI_TENANCY,
   process.env.OCI_USER,
   process.env.OCI_FINGERPRINT,
-  // se você salvou a chave com quebras de linha escapadas (\\n), reconverta:
-  process.env.OCI_PRIVATE_KEY ? process.env.OCI_PRIVATE_KEY.replace(/\\n/g, "\n") : undefined,
+  process.env.OCI_PRIVATE_KEY
+    ? process.env.OCI_PRIVATE_KEY.replace(/\\n/g, "\n")
+    : undefined,
   process.env.OCI_PASSPHRASE || null,
-  // converte "us-ashburn-1" em common.Region.US_PHOENIX_1, etc.
-  common.Region.fromRegionId(process.env.OCI_REGION)
+  Region.fromRegionId(process.env.OCI_REGION)
 );
 
-const objectStorageClient   = new ObjectStorageClient({ authenticationDetailsProvider: provider });
+const objectStorageClient = new ObjectStorageClient({
+  authenticationDetailsProvider: provider,
+});
 
 const NAMESPACE = "axcyntfguubc";
 const BUCKET  = "bucket-phldev";
