@@ -6,10 +6,22 @@ import { urls } from './../utils/urls.js';
 import { loadingAnimation } from './../utils/animation.js';
 import { format } from 'date-fns';
 import localePtBr from 'date-fns/locale/pt-BR';
-import { ConfigFileAuthenticationDetailsProvider } from "oci-common";
+import { common } from "oci-common";
 import { ObjectStorageClient } from "oci-objectstorage";
 
-const provider = new ConfigFileAuthenticationDetailsProvider();
+// const provider = new ConfigFileAuthenticationDetailsProvider();
+
+const provider = new common.SimpleAuthenticationDetailsProvider(
+  process.env.OCI_TENANCY,
+  process.env.OCI_USER,
+  process.env.OCI_FINGERPRINT,
+  // se você salvou a chave com quebras de linha escapadas (\\n), reconverta:
+  process.env.OCI_PRIVATE_KEY ? process.env.OCI_PRIVATE_KEY.replace(/\\n/g, "\n") : undefined,
+  process.env.OCI_PASSPHRASE || null,
+  // converte "us-ashburn-1" em common.Region.US_PHOENIX_1, etc.
+  common.Region.fromRegionId(process.env.OCI_REGION)
+);
+
 const objectStorageClient   = new ObjectStorageClient({ authenticationDetailsProvider: provider });
 
 const NAMESPACE = "axcyntfguubc";
