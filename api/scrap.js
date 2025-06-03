@@ -20,6 +20,10 @@ console.log(">>> RAW KEY INCLUDES \\n LITERALS? ", rawKey?.includes("\\n"));
 console.log(">>> RAW KEY INCLUDES actual newline? ", rawKey?.includes("\n"));
 console.log(">>> RAW KEY LENGTH:", rawKey?.length);
 
+if (rawKey?.startsWith('"') && rawKey?.endsWith('"')) {
+  rawKey = rawKey.slice(1, -1);
+}
+
 const pemKey = rawKey ? rawKey.replace(/\\n/g, "\n") : undefined;
 
 const provider = new SimpleAuthenticationDetailsProvider(
