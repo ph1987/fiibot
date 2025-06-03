@@ -22,21 +22,14 @@ console.log(">>> RAW KEY LENGTH:", rawKey?.length);
 
 const pemKey = rawKey ? rawKey.replace(/\\n/g, "\n") : undefined;
 
-
-try {
-	const provider = new SimpleAuthenticationDetailsProvider(
-		process.env.OCI_TENANCY,
-		process.env.OCI_USER,
-		process.env.OCI_FINGERPRINT,
-		process.env.OCI_PRIVATE_KEY
-			? process.env.OCI_PRIVATE_KEY.replace(/\\n/g, "\n")
-			: undefined,
-		process.env.OCI_PASSPHRASE || null,
-		Region.fromRegionId(process.env.OCI_REGION)
-	);
-} catch (err) {
-  console.error("FAILED_TO_CREATE_PROVIDER:", err);
-}
+const provider = new SimpleAuthenticationDetailsProvider(
+  process.env.OCI_TENANCY,
+  process.env.OCI_USER,
+  process.env.OCI_FINGERPRINT,
+  pemKey,
+  process.env.OCI_PASSPHRASE || null,
+  Region.fromRegionId(process.env.OCI_REGION)
+);
 
 const objectStorageClient = new ObjectStorageClient({
   authenticationDetailsProvider: provider,
