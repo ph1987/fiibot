@@ -9,8 +9,8 @@ import localePtBr from 'date-fns/locale/pt-BR';
 import { ConfigFileAuthenticationDetailsProvider } from "oci-common";
 import { ObjectStorageClient } from "oci-objectstorage";
 
-const provider = new ConfigFileAuthenticationDetailsProvider();
-const objectStorageClient   = new ObjectStorageClient({ authenticationDetailsProvider: provider });
+//const provider = new ConfigFileAuthenticationDetailsProvider();
+//const objectStorageClient   = new ObjectStorageClient({ authenticationDetailsProvider: provider });
 
 const NAMESPACE = "axcyntfguubc";
 const BUCKET  = "bucket-phldev";
@@ -42,6 +42,7 @@ async function saveFile(results) {
   fs.writeFileSync(`./history/${fileName}.json`, JSON.stringify(jsonContent, null, 2));
 
 	// BUCKET
+  /*
 	const txtBody = Buffer.from(fileContent, "utf-8");
 	await objectStorageClient.putObject({
 		namespaceName: NAMESPACE,
@@ -57,6 +58,7 @@ async function saveFile(results) {
 		objectName:    `fiibot/history/json/${fileName}.json`,
 		putObjectBody: jsonBody
 	});
+  */
 }
 
 function delay(ms) {
