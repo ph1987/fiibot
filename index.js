@@ -6,8 +6,8 @@ import { urls } from './utils/urls.js';
 import { loadingAnimation } from './utils/animation.js';
 import { format } from 'date-fns';
 import localePtBr from 'date-fns/locale/pt-BR';
-import { ConfigFileAuthenticationDetailsProvider } from "oci-common";
-import { ObjectStorageClient } from "oci-objectstorage";
+//import { ConfigFileAuthenticationDetailsProvider } from "oci-common";
+//import { ObjectStorageClient } from "oci-objectstorage";
 
 //const provider = new ConfigFileAuthenticationDetailsProvider();
 //const objectStorageClient   = new ObjectStorageClient({ authenticationDetailsProvider: provider });
@@ -74,10 +74,10 @@ async function fetchData(url, key) {
     });
     const html = response.data;
 
-    const t = $('.indicators__box', html);
+    const indicators = $('.indicators__box', html);
     let result = null;
 
-    t.each((_, div) => {
+    indicators.each((_, div) => {
       if ($(div).text().toLocaleLowerCase().includes('p/vp')) {
         const txt = $(div).text().replace(/\s{2,}/g, ' ').trim().toLocaleLowerCase();
         const value = Number(txt.split(' ')[1].replace(',', '.'));
