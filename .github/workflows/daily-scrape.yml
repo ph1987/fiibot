@@ -1,0 +1,49 @@
+name: Daily Web Scrape
+
+on:
+  schedule:
+    # roda todo dia às 11:00 UTC (08:00 em America/Sao_Paulo)
+    - cron: "0 11 * * *"
+  workflow_dispatch: {} # permite rodar manualmente pelo Actions
+
+permissions:
+  contents: write   # necessário para commitar no repositório
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci || npm i
+
+      - name: Run scraper
+        run: node index.js
+
+      - name: Commit changes (if any)
+        run: |
+          if [ -n "$(git status --porcelain history)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add history
+            git commit -m "chore(history): update $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+            git push
+          else
+            echo "Sem mudanças em history/ — nada a commitar."
+          fi
+
+      - name: Upload artifacts (opcional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: history-files
+          path: history/**
+          if-no-files-found: ignore

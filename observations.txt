@@ -1,0 +1,11 @@
+Observações importantes:
+
+O horário do cron é em UTC. No exemplo, 11:00 UTC = 08:00 em America/Sao_Paulo. Ajuste se quiser outro horário.
+
+O permissions: contents: write e o actions/checkout@v4 permitem usar o GITHUB_TOKEN padrão pra dar push sem configurar secret extra.
+
+O passo “Upload artifacts” é opcional, só pra baixar os arquivos gerados direto na aba “Actions”.
+
+Certifique-se que o script roda com node index.js (como já está).
+
+Se algum dia você reativar o upload pro OCI Object Storage, mova as credenciais pro GitHub Secrets (ex.: OCI_CONFIG_CONTENT ou variáveis específicas) e ajuste o passo “Run scraper” pra escrever o arquivo de config temporário antes de rodar. Se quiser, eu já te deixo o trecho pronto.
